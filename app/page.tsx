@@ -1,5 +1,12 @@
 export default function Home() {
   return (
-    <div className="font-bold text-6xl">Hello Sultan</div>
+    <main className="min-h-screen p-24">
+      <h1 className="text-4xl font-bold text-center">
+        DU CMC Result System
+      </h1>
+      <p className="text-center mt-4 text-gray-600">
+        Welcome to the result management system
+      </p>
+    </main>
   );
 }
