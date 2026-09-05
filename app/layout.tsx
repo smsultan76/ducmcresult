@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "DU CMC Result System",
-  description: "Dhaka University CMC Result Management System",
+  description: "Dhaka University Constituent Medical College Result Management System",
 };
 
 export default function RootLayout({
