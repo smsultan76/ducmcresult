@@ -243,16 +243,11 @@ export default function Home() {
   }, [loading]);
 
   return (
-    <main className="min-h-screen bg-gray-50 py-4 sm:py-8">
+    <main className="min-h-screen bg-gray-50 sm:py-8">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-4 sm:mb-8 no-print">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-purple-800 mb-1 sm:mb-2">
-            DU CMC Result System
-          </h1>
-          <p className="text-sm sm:text-base text-gray-600">
-            Dhaka University Constituent Medical College - Batch Result Lookup
-          </p>
+        <div className="mb-4 sm:mb-8 no-print">
+          <img src="/ducmc.png" alt="" className="mx-auto"/>
         </div>
 
         {/* Input Form - Hidden when printing */}
