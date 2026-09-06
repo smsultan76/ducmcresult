@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import ResultTable from './components/ResultTable';
 
-// Types
 interface ResultData {
   reg_no: string | number;
   student_name: string;
@@ -38,7 +37,6 @@ export default function Home() {
     exam: string;
   } | null>(null);
   
-  // Dynamic data states
   const [programs, setPrograms] = useState<Option[]>([]);
   const [sessions, setSessions] = useState<Option[]>([]);
   const [exams, setExams] = useState<Option[]>([]);
@@ -48,7 +46,6 @@ export default function Home() {
   
   const tableRef = useRef<HTMLDivElement>(null);
 
-  // Fetch programs and sessions on component mount
   useEffect(() => {
     const fetchOptions = async () => {
       try {
@@ -72,7 +69,6 @@ export default function Home() {
     fetchOptions();
   }, []);
 
-  // Fetch exams when program changes
   useEffect(() => {
     const fetchExams = async () => {
       if (!programId) {
@@ -83,6 +79,7 @@ export default function Home() {
 
       setLoadingExams(true);
       setExamError(null);
+      setExamId(''); // Reset selected exam
       
       try {
         console.log(`Fetching exams for program: ${programId}`);
@@ -95,9 +92,10 @@ export default function Home() {
           if (data.exams && data.exams.length > 0) {
             setExams(data.exams);
             console.log(`Loaded ${data.exams.length} exams`);
+            setExamError(null);
           } else {
             setExams([]);
-            setExamError('No exams available for this program');
+            setExamError(data.message || 'No exams available for this program');
             console.log('No exams found for this program');
           }
         } else {
@@ -106,19 +104,23 @@ export default function Home() {
         }
       } catch (err) {
         console.error('Error fetching exams:', err);
-        setExamError('Failed to load exams');
+        setExamError('Network error while loading exams');
         setExams([]);
       } finally {
         setLoadingExams(false);
       }
     };
 
-    fetchExams();
+    const timeoutId = setTimeout(() => {
+      fetchExams();
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
   }, [programId]);
 
   const handleProgramChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setProgramId(e.target.value);
-    setExamId(''); // Reset exam when program changes
+    setExamId('');
     setExamError(null);
   };
 
@@ -130,7 +132,6 @@ export default function Home() {
       return;
     }
 
-    // Get selected names for caption
     const program = programs.find(p => p.id === programId);
     const session = sessions.find(s => s.id === sessionId);
     const exam = exams.find(e => e.id === examId);
@@ -164,7 +165,6 @@ export default function Home() {
       if (!data.success) {
         setError(data.error || 'Failed to fetch results');
       } else {
-        // Filter out results with errors or missing data
         const validResults = data.data.filter((result: ResultData) => {
           const hasError = result.error || 
                           (result.gpa === null && result.cgpa === null) ||
@@ -228,7 +228,6 @@ export default function Home() {
     }
   };
 
-  // Simulate progress updates from API
   useEffect(() => {
     if (loading) {
       let currentProgress = 0;
@@ -242,21 +241,6 @@ export default function Home() {
       return () => clearInterval(interval);
     }
   }, [loading]);
-
-  // Also fetch exams when program changes and we have a selected program
-  useEffect(() => {
-    if (programId) {
-      // This will trigger the fetchExams effect above
-    }
-  }, [programId]);
-
-  // Debug: Log states
-  useEffect(() => {
-    console.log('Programs:', programs.length);
-    console.log('Sessions:', sessions.length);
-    console.log('Exams:', exams.length);
-    console.log('Selected Program ID:', programId);
-  }, [programs, sessions, exams, programId]);
 
   return (
     <main className="min-h-screen bg-gray-50 py-4 sm:py-8">
@@ -314,7 +298,10 @@ export default function Home() {
                   ))}
                 </select>
                 {loadingOptions && (
-                  <p className="mt-1 text-xs text-gray-500">Loading programs...</p>
+                  <p className="mt-1 text-xs text-blue-600">
+                    <span className="inline-block animate-spin mr-1">⟳</span>
+                    Loading programs...
+                  </p>
                 )}
               </div>
 
@@ -338,7 +325,10 @@ export default function Home() {
                   ))}
                 </select>
                 {loadingOptions && (
-                  <p className="mt-1 text-xs text-gray-500">Loading sessions...</p>
+                  <p className="mt-1 text-xs text-blue-600">
+                    <span className="inline-block animate-spin mr-1">⟳</span>
+                    Loading sessions...
+                  </p>
                 )}
               </div>
 
@@ -352,7 +342,7 @@ export default function Home() {
                   value={examId}
                   onChange={(e) => setExamId(e.target.value)}
                   className="w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm p-2 border"
-                  disabled={loading || !programId || loadingExams}
+                  disabled={loading || !programId || loadingExams || exams.length === 0}
                 >
                   <option value="">Select your Exam Name</option>
                   {exams.map((exam) => (
@@ -361,31 +351,42 @@ export default function Home() {
                     </option>
                   ))}
                 </select>
+                
+                {/* Loading state */}
                 {loadingExams && (
-                  <p className="mt-1 text-xs text-gray-500">Loading exams...</p>
-                )}
-                {examError && (
-                  <p className="mt-1 text-xs text-yellow-600">{examError}</p>
-                )}
-                {!loadingExams && !examError && programId && exams.length === 0 && (
-                  <p className="mt-1 text-xs text-yellow-600">
-                    No exams available for this program
+                  <p className="mt-1 text-xs text-blue-600">
+                    <span className="inline-block animate-spin mr-1">⟳</span>
+                    Loading exams...
                   </p>
                 )}
+                
+                {/* Error/Info states */}
+                {!loadingExams && programId && exams.length === 0 && (
+                  <p className="mt-1 text-xs text-yellow-600">
+                    ⚠️ {examError || 'No exams available for this program. Please try another program.'}
+                  </p>
+                )}
+                
                 {!programId && (
                   <p className="mt-1 text-xs text-gray-400">
                     Please select a program first
                   </p>
                 )}
+                
+                {/* Success state */}
+                {!loadingExams && programId && exams.length > 0 && (
+                  <p className="mt-1 text-xs text-green-600">
+                    ✓ {exams.length} exam(s) available
+                  </p>
+                )}
               </div>
             </div>
 
-            {/* Rest of the form remains the same */}
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-2 sm:gap-3 pt-1 sm:pt-2">
               <button
                 type="submit"
-                disabled={loading || loadingOptions || loadingExams || !examId}
+                disabled={loading || loadingOptions || loadingExams || !examId || exams.length === 0}
                 className="flex-1 bg-purple-600 text-white px-3 sm:px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
               >
                 {loading ? (
