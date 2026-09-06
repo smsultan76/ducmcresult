@@ -12,133 +12,10 @@ interface ResultData {
   error?: string;
 }
 
-// Mock data - In production, fetch from API
-const PROGRAMS = [
-  { id: '1', name: 'M.B.B.S.' },
-  { id: '2', name: 'Basic B.Sc. in Nursing' },
-  { id: '3', name: 'Post basic B.Sc. in Nursing' },
-  { id: '4', name: 'B.D.S.' },
-  { id: '5', name: 'B.Sc. in Health Technology (Laboratory)' },
-  { id: '6', name: 'B.Sc. in Health Technology (Dental)' },
-  { id: '7', name: 'B.Sc.(Public Health Nursing)' },
-  { id: '8', name: 'M.Sc. in Physiotherapy' },
-  { id: '9', name: 'M.Sc. in Rehabilitation Science' },
-  { id: '10', name: 'B.Sc. in Physiotherapy' },
-  { id: '11', name: 'B.Sc. in Textile Engineering' },
-  { id: '12', name: 'B.Sc. in Civil Engineering' },
-  { id: '13', name: 'B.Sc. in Electrical and Electronic Engineering' },
-  { id: '14', name: 'B.Sc. in Computer Science and Engineering' },
-  { id: '15', name: 'B.Sc. in Speech & Language Therapy' },
-  { id: '16', name: 'B.Sc. in Occupational Therapy' },
-  { id: '17', name: 'B.Sc. in Fashion Design and Apparel Engineering' },
-  { id: '18', name: 'B.Sc. in Industrial and Production Engineering' },
-  { id: '19', name: 'B.Sc. in Health Technology (Radiology and Imaging)' },
-  { id: '20', name: 'M.Sc. in Textile Engineering' },
-  { id: '21', name: 'B.H.M.S.' },
-  { id: '22', name: 'B.A.M.S' },
-  { id: '23', name: 'B.U.M.S.' },
-  { id: '24', name: 'MAFCM' },
-  { id: '25', name: 'Post Graduate Diploma in Film and Television' },
-  { id: '26', name: 'Bachelor of Photography' },
-  { id: '27', name: 'MSc. in Applied Epidemiology' },
-  { id: '28', name: 'MBA in Textile and Apparel Value Chain' },
-  { id: '29', name: 'B.Sc. in Health Technology (Food Safety)' },
-  { id: '30', name: 'Food and Nutrition' },
-  { id: '31', name: 'Resource Management and Entrepreneurship' },
-  { id: '32', name: 'Child Development and Social Relationship' },
-  { id: '33', name: 'Art and Creative Studies' },
-  { id: '34', name: 'Clothing and Textile' },
-  { id: '35', name: 'Civil Engineering' },
-  { id: '36', name: 'Electrical and Electronics Engineering' },
-  { id: '37', name: 'Mechanical Engineering' },
-  { id: '38', name: 'Post Graduate Diploma in Broadcast Journalism' },
-  { id: '39', name: 'Master in Human Security' },
-  { id: '40', name: 'Master of Economics (Environmental Economics)' },
-  { id: '41', name: 'Master of Economics (MEcon) in Development Economics' },
-  { id: '42', name: 'Master of Economics (Entrepreneurship Economics)' },
-  { id: '43', name: 'Post Graduate Diploma in Enterprise Development' },
-  { id: '44', name: 'Post Graduate Diploma in Economics' },
-  { id: '45', name: 'Bachelor of Social Sciences (Honours) in Environmental and Resource Economics' },
-  { id: '46', name: 'Bachelor of Social Sciences (Honours) in Entrepreneurial Economics' },
-  { id: '47', name: 'Bachelor of Social Sciences (Honours) in Development Economics' },
-  { id: '48', name: 'Masters in Bank Management' },
-  { id: '49', name: 'Evening Masters in Bank Management' },
-  { id: '50', name: 'M.Sc. in Home Economics (Child Development and Family Relations)' },
-  { id: '51', name: 'B.Sc (Pass) in Home Economics' },
-  { id: '52', name: 'B.Sc. in Prosthetics & Orthotics' },
-  { id: '53', name: 'Master of Science in Nursing' },
-  { id: '54', name: 'Master of Environmental and Resource Economics' },
-  { id: '55', name: 'B.Sc. in Mechanical Engineering' },
-  { id: '56', name: 'B.Sc. in Midwifery' },
-  { id: '57', name: 'MS in Home Economics (Child Development and Social Relationship)' },
-  { id: '58', name: 'MS in Home Economics (Food and Nutrition)' },
-  { id: '59', name: 'MS in Home Economics (Resource Management and Entrepreneurship)' },
-  { id: '60', name: 'MS in Home Economics (Art and Creative Studies)' },
-  { id: '61', name: 'MS in Home Economics (Clothing and Textile)' },
-  { id: '62', name: 'M.Sc. in Occupational Therapy' },
-  { id: '63', name: 'Professional Masters in Information and Cyber Security(PMICS)' },
-  { id: '64', name: 'Master of Development Economics' },
-];
-
-const SESSIONS = [
-  { id: '26', name: '2025-2026' },
-  { id: '25', name: '2024-2025' },
-  { id: '24', name: '2023-2024' },
-  { id: '23', name: '2022-2023' },
-  { id: '22', name: '2021-2022' },
-  { id: '21', name: '2020-2021' },
-  { id: '20', name: '2019-2020' },
-  { id: '19', name: '2018-2019' },
-  { id: '18', name: '2017-2018' },
-  { id: '17', name: '2016-2017' },
-  { id: '16', name: '2015-2016' },
-  { id: '15', name: '2014-2015' },
-  { id: '14', name: '2013-2014' },
-  { id: '13', name: '2012-2013' },
-  { id: '12', name: '2011-2012' },
-  { id: '11', name: '2010-2011' },
-  { id: '10', name: '2009-2010' },
-  { id: '9', name: '2008-2009' },
-  { id: '8', name: '2007-2008' },
-  { id: '7', name: '2006-2007' },
-  { id: '6', name: '2005-2006' },
-  { id: '5', name: '2004-2005' },
-  { id: '4', name: '2003-2004' },
-  { id: '3', name: '2002-2003' },
-  { id: '2', name: '2001-2002' },
-  { id: '1', name: '2000-2001' },
-  { id: '100', name: '1999-2000' },
-  { id: '99', name: '1998-1999' },
-  { id: '98', name: '1997-1998' },
-  { id: '97', name: '1996-1997' },
-  { id: '96', name: '1995-1996' },
-  { id: '95', name: '1994-1995' },
-  { id: '94', name: '1993-1994' },
-  { id: '93', name: '1992-1993' },
-  { id: '92', name: '1991-1992' },
-  { id: '91', name: '1990-1991' },
-  { id: '90', name: '1989-1990' },
-  { id: '89', name: '1988-1989' },
-  { id: '88', name: '1987-1988' },
-  { id: '87', name: '1986-1987' },
-  { id: '86', name: '1985-1986' },
-  { id: '85', name: '1984-1985' },
-  { id: '84', name: '1983-1984' },
-];
-
-// This would be fetched from API in production
-const EXAMS: { [key: string]: { id: string; name: string }[] } = {
-  '14': [
-    { id: '1387', name: 'Final Year' },
-    { id: '1386', name: 'Third Year' },
-    { id: '1385', name: 'Second Year' },
-  ],
-  '1': [
-    { id: '1387', name: 'Final Professional' },
-    { id: '1386', name: 'Third Professional' },
-  ],
-  // Add more exams for each program
-};
+interface Option {
+  id: string;
+  name: string;
+}
 
 export default function Home() {
   const [registrationInput, setRegistrationInput] = useState('');
@@ -154,11 +31,95 @@ export default function Home() {
   const [selectedProgram, setSelectedProgram] = useState('');
   const [selectedSession, setSelectedSession] = useState('');
   const [selectedExam, setSelectedExam] = useState('');
+  const [printData, setPrintData] = useState<{
+    results: ResultData[];
+    program: string;
+    session: string;
+    exam: string;
+  } | null>(null);
+  
+  // Dynamic data states
+  const [programs, setPrograms] = useState<Option[]>([]);
+  const [sessions, setSessions] = useState<Option[]>([]);
+  const [exams, setExams] = useState<Option[]>([]);
+  const [loadingOptions, setLoadingOptions] = useState(true);
+  const [loadingExams, setLoadingExams] = useState(false);
+  const [examError, setExamError] = useState<string | null>(null);
+  
   const tableRef = useRef<HTMLDivElement>(null);
+
+  // Fetch programs and sessions on component mount
+  useEffect(() => {
+    const fetchOptions = async () => {
+      try {
+        const response = await fetch('/api/options');
+        const data = await response.json();
+        
+        if (data.success) {
+          setPrograms(data.programs);
+          setSessions(data.sessions);
+        } else {
+          setError('Failed to load programs and sessions');
+        }
+      } catch (err) {
+        console.error('Error fetching options:', err);
+        setError('Failed to load options');
+      } finally {
+        setLoadingOptions(false);
+      }
+    };
+
+    fetchOptions();
+  }, []);
+
+  // Fetch exams when program changes
+  useEffect(() => {
+    const fetchExams = async () => {
+      if (!programId) {
+        setExams([]);
+        setExamError(null);
+        return;
+      }
+
+      setLoadingExams(true);
+      setExamError(null);
+      
+      try {
+        console.log(`Fetching exams for program: ${programId}`);
+        const response = await fetch(`/api/exams?program_id=${programId}`);
+        const data = await response.json();
+        
+        console.log('Exams response:', data);
+        
+        if (data.success) {
+          if (data.exams && data.exams.length > 0) {
+            setExams(data.exams);
+            console.log(`Loaded ${data.exams.length} exams`);
+          } else {
+            setExams([]);
+            setExamError('No exams available for this program');
+            console.log('No exams found for this program');
+          }
+        } else {
+          setExamError(data.error || 'Failed to load exams');
+          setExams([]);
+        }
+      } catch (err) {
+        console.error('Error fetching exams:', err);
+        setExamError('Failed to load exams');
+        setExams([]);
+      } finally {
+        setLoadingExams(false);
+      }
+    };
+
+    fetchExams();
+  }, [programId]);
 
   const handleProgramChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setProgramId(e.target.value);
-    setExamId('');
+    setExamId(''); // Reset exam when program changes
+    setExamError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -170,9 +131,9 @@ export default function Home() {
     }
 
     // Get selected names for caption
-    const program = PROGRAMS.find(p => p.id === programId);
-    const session = SESSIONS.find(s => s.id === sessionId);
-    const exam = EXAMS[programId]?.find(e => e.id === examId);
+    const program = programs.find(p => p.id === programId);
+    const session = sessions.find(s => s.id === sessionId);
+    const exam = exams.find(e => e.id === examId);
     
     setSelectedProgram(program?.name || '');
     setSelectedSession(session?.name || '');
@@ -184,6 +145,7 @@ export default function Home() {
     setProgress(0);
     setCurrentRegistration('');
     setNotFoundRegistrations([]);
+    setPrintData(null);
 
     try {
       const response = await fetch('/api/batch-results', {
@@ -219,6 +181,12 @@ export default function Home() {
         });
 
         setResults(validResults);
+        setPrintData({
+          results: validResults,
+          program: program?.name || '',
+          session: session?.name || '',
+          exam: exam?.name || ''
+        });
         setProgress(100);
         
         if (validResults.length === 0 && data.data.length > 0) {
@@ -249,15 +217,15 @@ export default function Home() {
     setSelectedProgram('');
     setSelectedSession('');
     setSelectedExam('');
+    setPrintData(null);
+    setExamError(null);
   };
 
   const handlePrint = () => {
-    window.print();
-  };
-
-  const getExams = () => {
-    if (!programId) return [];
-    return EXAMS[programId] || [];
+    if (printData) {
+      localStorage.setItem('printData', JSON.stringify(printData));
+      window.open('/print', '_blank');
+    }
   };
 
   // Simulate progress updates from API
@@ -274,6 +242,21 @@ export default function Home() {
       return () => clearInterval(interval);
     }
   }, [loading]);
+
+  // Also fetch exams when program changes and we have a selected program
+  useEffect(() => {
+    if (programId) {
+      // This will trigger the fetchExams effect above
+    }
+  }, [programId]);
+
+  // Debug: Log states
+  useEffect(() => {
+    console.log('Programs:', programs.length);
+    console.log('Sessions:', sessions.length);
+    console.log('Exams:', exams.length);
+    console.log('Selected Program ID:', programId);
+  }, [programs, sessions, exams, programId]);
 
   return (
     <main className="min-h-screen bg-gray-50 py-4 sm:py-8">
@@ -321,15 +304,18 @@ export default function Home() {
                   value={programId}
                   onChange={handleProgramChange}
                   className="w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm p-2 border"
-                  disabled={loading}
+                  disabled={loading || loadingOptions}
                 >
-                  <option value="">Select Program</option>
-                  {PROGRAMS.map((program) => (
+                  <option value="">Select your Program Name</option>
+                  {programs.map((program) => (
                     <option key={program.id} value={program.id}>
                       {program.name}
                     </option>
                   ))}
                 </select>
+                {loadingOptions && (
+                  <p className="mt-1 text-xs text-gray-500">Loading programs...</p>
+                )}
               </div>
 
               {/* Session Selection */}
@@ -342,15 +328,18 @@ export default function Home() {
                   value={sessionId}
                   onChange={(e) => setSessionId(e.target.value)}
                   className="w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm p-2 border"
-                  disabled={loading}
+                  disabled={loading || loadingOptions}
                 >
-                  <option value="">Select Session</option>
-                  {SESSIONS.map((session) => (
+                  <option value="">Select your Session</option>
+                  {sessions.map((session) => (
                     <option key={session.id} value={session.id}>
                       {session.name}
                     </option>
                   ))}
                 </select>
+                {loadingOptions && (
+                  <p className="mt-1 text-xs text-gray-500">Loading sessions...</p>
+                )}
               </div>
 
               {/* Exam Selection */}
@@ -363,28 +352,40 @@ export default function Home() {
                   value={examId}
                   onChange={(e) => setExamId(e.target.value)}
                   className="w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm p-2 border"
-                  disabled={loading || !programId}
+                  disabled={loading || !programId || loadingExams}
                 >
-                  <option value="">Select Exam</option>
-                  {getExams().map((exam) => (
+                  <option value="">Select your Exam Name</option>
+                  {exams.map((exam) => (
                     <option key={exam.id} value={exam.id}>
                       {exam.name}
                     </option>
                   ))}
                 </select>
-                {programId && getExams().length === 0 && (
+                {loadingExams && (
+                  <p className="mt-1 text-xs text-gray-500">Loading exams...</p>
+                )}
+                {examError && (
+                  <p className="mt-1 text-xs text-yellow-600">{examError}</p>
+                )}
+                {!loadingExams && !examError && programId && exams.length === 0 && (
                   <p className="mt-1 text-xs text-yellow-600">
                     No exams available for this program
+                  </p>
+                )}
+                {!programId && (
+                  <p className="mt-1 text-xs text-gray-400">
+                    Please select a program first
                   </p>
                 )}
               </div>
             </div>
 
+            {/* Rest of the form remains the same */}
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-2 sm:gap-3 pt-1 sm:pt-2">
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || loadingOptions || loadingExams || !examId}
                 className="flex-1 bg-purple-600 text-white px-3 sm:px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
               >
                 {loading ? (
@@ -460,7 +461,7 @@ export default function Home() {
                 onClick={handlePrint}
                 className="bg-green-600 text-white px-3 sm:px-4 py-1 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors text-xs sm:text-sm"
               >
-                🖨️ Print
+                🖨️ Print All
               </button>
             </div>
           )}
@@ -468,7 +469,7 @@ export default function Home() {
 
         {/* Results Table */}
         {results.length > 0 && (
-          <div ref={tableRef} className="print-area">
+          <div ref={tableRef}>
             <ResultTable 
               results={results} 
               programName={selectedProgram}
@@ -479,7 +480,7 @@ export default function Home() {
         )}
 
         {/* Empty State */}
-        {!loading && results.length === 0 && !error && (
+        {!loading && results.length === 0 && !error && !loadingOptions && (
           <div className="text-center py-8 sm:py-12 bg-white rounded-lg shadow no-print">
             <div className="text-4xl sm:text-6xl mb-3 sm:mb-4">🔍</div>
             <h3 className="text-lg sm:text-xl font-medium text-gray-700 mb-1 sm:mb-2">No Results Yet</h3>
