@@ -85,7 +85,7 @@ export default function PrintPage() {
 
       <div className="print-footer">
         <p>© {new Date().getFullYear()} University of Dhaka. All Rights Reserved.</p>
-        <p>Developed by: <a href="https://sultanum-mobin.vercel.app/">Sultanum Mobin</a></p>
+        <p>Developed by: <a href="https://sultanum-mobin.vercel.app/" target="_blank" className="text-blue-600">Sultanum Mobin</a></p>
       </div>
 
       <style jsx>{`
