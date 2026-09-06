@@ -21,13 +21,11 @@ export default function PrintPage() {
   const [data, setData] = useState<PrintData | null>(null);
 
   useEffect(() => {
-    // Get data from localStorage
     const storedData = localStorage.getItem('printData');
     if (storedData) {
       setData(JSON.parse(storedData));
     }
 
-    // Auto-print after loading
     const timer = setTimeout(() => {
       window.print();
     }, 500);
@@ -50,7 +48,6 @@ export default function PrintPage() {
 
   return (
     <div className="print-container">
-      {/* Print Header */}
       <div className="print-header">
         <h1>DU CMC Result System</h1>
         <h2>Batch Result Report</h2>
@@ -63,7 +60,6 @@ export default function PrintPage() {
         </div>
       </div>
 
-      {/* Results Table */}
       <table className="print-table">
         <thead>
           <tr>
@@ -87,10 +83,9 @@ export default function PrintPage() {
         </tbody>
       </table>
 
-      {/* Print Footer */}
       <div className="print-footer">
         <p>© {new Date().getFullYear()} University of Dhaka. All Rights Reserved.</p>
-        <p>Developed by: Office of the Controller of Examinations</p>
+        <p>Developed by: <a href="https://sultanum-mobin.vercel.app/">Sultanum Mobin</a></p>
       </div>
 
       <style jsx>{`
@@ -181,7 +176,6 @@ export default function PrintPage() {
           margin: 2px 0;
         }
 
-        /* Print Styles */
         @media print {
           body {
             margin: 0;
@@ -248,7 +242,6 @@ export default function PrintPage() {
           }
         }
 
-        /* Responsive */
         @media screen and (max-width: 600px) {
           .print-info {
             grid-template-columns: 1fr;
