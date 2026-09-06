@@ -1,19 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import axios from 'axios';
 import * as cheerio from 'cheerio';
 
-const TARGET_URL = process.env.DUCMC_API_URL || '';
-const COOKIE = process.env.DUCMC_COOKIE || '';
-const USER_AGENT = process.env.DUCMC_USER_AGENT || '';
+const EXAMS_API_URL = process.env.DUCMC_API_URL || '';
+const USER_AGENT = process.env.DUCMC_USER_AGENT || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
 const REQUEST_DELAY = parseInt(process.env.DUCMC_REQUEST_DELAY || '500');
 const MAX_REGISTRATIONS = parseInt(process.env.DUCMC_MAX_REGISTRATIONS || '60');
-
-const HEADERS = {
-  'Content-Type': 'application/x-www-form-urlencoded',
-  'X-Requested-With': 'XMLHttpRequest',
-  'User-Agent': USER_AGENT,
-  'Cookie': COOKIE
-};
 
 interface ResultData {
   reg_no: string | number;
@@ -139,7 +130,6 @@ async function fetchBatchResults(
       const result = await fetchSingleResult(regNo, programId, adjustedSessionId, examId);
       results.push(result);
       
-      // Add delay between requests to avoid server overload
       if (i < registrations.length - 1) {
         await delay(REQUEST_DELAY);
       }
@@ -166,21 +156,31 @@ async function fetchSingleResult(
   sessionId: number,
   examId: number
 ): Promise<ResultData> {
-  const payload = new URLSearchParams({
-    pro_id: programId.toString(),
-    sess_id: sessionId.toString(),
-    exam_id: examId.toString(),
-    reg_no: regNo.toString(),
-    gdata: '99'
-  });
-
   try {
-    const response = await axios.post(TARGET_URL, payload.toString(), {
-      headers: HEADERS,
-      timeout: 30000
+    const response = await fetch(EXAMS_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Requested-With': 'XMLHttpRequest',
+        'User-Agent': USER_AGENT,
+        'Accept': 'text/html, */*',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Origin': new URL(EXAMS_API_URL).origin,
+        'Referer': process.env.DUCMC_RESULT_PAGE || 'https://ducmc.du.ac.bd/result.php',
+      },
+      body: new URLSearchParams({
+        reg_no: regNo.toString(),
+        pro_id: programId.toString(),
+        sess_id: sessionId.toString(),
+        exam_id: examId.toString(),
+        gdata: '99'
+      }),
+      cache: 'no-store'
     });
 
-    if (response.status !== 200 || !response.data || response.data.trim() === '') {
+    const html = await response.text();
+
+    if (response.status !== 200 || !html || html.trim() === '') {
       return {
         reg_no: regNo,
         student_name: 'No data',
@@ -190,10 +190,8 @@ async function fetchSingleResult(
       };
     }
 
-    // Parse the HTML response
-    const $ = cheerio.load(response.data);
+    const $ = cheerio.load(html);
     
-    // Check if the response contains "No result found" or similar messages
     const responseText = $('body').text();
     if (responseText.includes('No result found') || 
         responseText.includes('not found') ||
@@ -208,7 +206,7 @@ async function fetchSingleResult(
       };
     }
     
-    // Extract student name - try multiple selectors
+    // Extract student name
     let studentName = 'Not found';
     const nameSelectors = [
       'th:contains("Student")',
