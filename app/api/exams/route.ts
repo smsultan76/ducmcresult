@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import axios from 'axios';
-import * as cheerio from 'cheerio';
 
-// The AJAX endpoint from the page
-const EXAMS_API_URL = 'https://ducmc.du.ac.bd/ajax/get_program_by_exam.php';
+const EXAMS_API_URL = process.env.DUCMC_API_URL || '';
+const USER_AGENT = process.env.DUCMC_USER_AGENT || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,82 +17,129 @@ export async function GET(request: NextRequest) {
 
     console.log(`Fetching exams for program ID: ${programId}`);
 
-    // Call the same AJAX endpoint the page uses
-    const response = await axios.post(
-      EXAMS_API_URL,
-      new URLSearchParams({
-        program_id: programId,
-        pedata: '99'
-      }),
-      {
+    let exams: { id: string; name: string }[] = [];
+    
+    try {
+      const response = await fetch(`${EXAMS_API_URL}?program_id=${programId}&pedata=99`, {
+        method: 'GET',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
           'X-Requested-With': 'XMLHttpRequest',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'User-Agent': USER_AGENT,
           'Accept': 'text/html, */*',
           'Accept-Language': 'en-US,en;q=0.9',
-          'Origin': 'https://ducmc.du.ac.bd',
-          'Referer': 'https://ducmc.du.ac.bd/result.php',
-          'Cookie': process.env.DUCMC_COOKIE || 'PHPSESSID=d5d815feffdf8d5c955eeb7e446ae929'
+          'Origin': new URL(EXAMS_API_URL).origin,
+          'Referer': process.env.DUCMC_RESULT_PAGE || 'https://ducmc.du.ac.bd/result.php',
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
         },
-        timeout: 30000
-      }
-    );
-
-    console.log('Response status:', response.status);
-    console.log('Response data length:', response.data?.length || 0);
-
-    // Check if we got a response
-    if (!response.data || response.data.trim() === '') {
-      console.log('Empty response received');
-      return NextResponse.json({
-        success: true,
-        exams: []
+        cache: 'no-store'
       });
-    }
 
-    // Parse the HTML response from the AJAX call
-    const html = response.data;
-    const $ = cheerio.load(html);
-
-    // Parse exams from the select options
-    const exams: { id: string; name: string }[] = [];
-    
-    // Try to find options in the response
-    $('option').each((_, option) => {
-      const value = $(option).attr('value');
-      const text = $(option).text().trim();
-      if (value && value !== '' && text !== 'Select your Exam Name') {
-        exams.push({ id: value, name: text });
-      }
-    });
-
-    // If no options found, try to parse any select element
-    if (exams.length === 0) {
-      $('select option').each((_, option) => {
-        const value = $(option).attr('value');
-        const text = $(option).text().trim();
-        if (value && value !== '') {
+      const html = await response.text();
+      console.log(`GET response length: ${html.length}`);
+      
+      const optionRegex = /<option\s+value="([^"]+)"[^>]*>([^<]+)<\/option>/g;
+      let match;
+      while ((match = optionRegex.exec(html)) !== null) {
+        const value = match[1].trim();
+        const text = match[2].trim();
+        if (value && value !== '' && text && text !== 'Select your Exam Name' && text !== 'Select Exam') {
           exams.push({ id: value, name: text });
         }
-      });
+      }
+    } catch (error) {
+      console.log('GET method failed, trying POST...');
     }
 
-    console.log(`Found ${exams.length} exams for program ${programId}`);
+    if (exams.length === 0) {
+      try {
+        const postResponse = await fetch(EXAMS_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest',
+            'User-Agent': USER_AGENT,
+            'Accept': 'text/html, */*',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Origin': new URL(EXAMS_API_URL).origin,
+            'Referer': process.env.DUCMC_RESULT_PAGE || 'https://ducmc.du.ac.bd/result.php',
+          },
+          body: new URLSearchParams({
+            program_id: programId,
+            pedata: '99'
+          }),
+          cache: 'no-store'
+        });
+
+        const postHtml = await postResponse.text();
+        console.log(`POST response length: ${postHtml.length}`);
+        
+        const postOptionRegex = /<option\s+value="([^"]+)"[^>]*>([^<]+)<\/option>/g;
+        let match;
+        while ((match = postOptionRegex.exec(postHtml)) !== null) {
+          const value = match[1].trim();
+          const text = match[2].trim();
+          if (value && value !== '' && text && text !== 'Select your Exam Name' && text !== 'Select Exam') {
+            exams.push({ id: value, name: text });
+          }
+        }
+      } catch (error) {
+        console.log('POST method also failed');
+      }
+    }
+
+    if (exams.length === 0) {
+      console.log('Trying to extract from main page...');
+      
+      try {
+        const mainResponse = await fetch(process.env.DUCMC_RESULT_PAGE || 'https://ducmc.du.ac.bd/result.php', {
+          headers: {
+            'User-Agent': USER_AGENT
+          }
+        });
+        
+        const mainHtml = await mainResponse.text();
+        
+        const selectRegex = /<select[^>]*id="exam_id"[^>]*>([\s\S]*?)<\/select>/;
+        const selectMatch = mainHtml.match(selectRegex);
+        
+        if (selectMatch) {
+          const selectHtml = selectMatch[1];
+          const mainOptionRegex = /<option\s+value="([^"]+)"[^>]*>([^<]+)<\/option>/g;
+          let match;
+          while ((match = mainOptionRegex.exec(selectHtml)) !== null) {
+            const value = match[1].trim();
+            const text = match[2].trim();
+            if (value && value !== '' && text && text !== 'Select your Exam Name' && text !== 'Select Exam') {
+              exams.push({ id: value, name: text });
+            }
+          }
+          console.log(`Found ${exams.length} exams from main page`);
+        }
+      } catch (error) {
+        console.log('Main page extraction failed');
+      }
+    }
+
+    console.log(`Returning ${exams.length} exams for program ${programId}`);
 
     return NextResponse.json({
       success: true,
-      exams
+      exams,
+      _debug: {
+        examsFound: exams.length
+      }
     });
 
   } catch (error: any) {
-    console.error('Error fetching exams:', error.message);
-    
-    // Return empty exams array instead of error
-    return NextResponse.json({
-      success: true,
-      exams: [],
-      _debug: error.message
-    });
+    console.error('Error fetching exams:', error);
+    return NextResponse.json(
+      { 
+        success: false, 
+        error: error.message || 'Failed to fetch exams',
+        exams: []
+      },
+      { status: 500 }
+    );
   }
 }
