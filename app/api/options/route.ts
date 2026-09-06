@@ -2,11 +2,10 @@ import { NextResponse } from 'next/server';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
-const RESULT_PAGE_URL = 'https://ducmc.du.ac.bd/result.php';
+const RESULT_PAGE_URL = process.env.DUCMC_RESULT_PAGE || '';
 
 export async function GET() {
   try {
-    // Fetch the result page
     const response = await axios.get(RESULT_PAGE_URL, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
@@ -16,7 +15,6 @@ export async function GET() {
     const html = response.data;
     const $ = cheerio.load(html);
 
-    // Parse Programs from the select element with id="pro_id"
     const programs: { id: string; name: string }[] = [];
     $('#pro_id option').each((_, option) => {
       const value = $(option).attr('value');
@@ -26,7 +24,6 @@ export async function GET() {
       }
     });
 
-    // Parse Sessions from the select element with id="sess_id"
     const sessions: { id: string; name: string }[] = [];
     $('#sess_id option').each((_, option) => {
       const value = $(option).attr('value');
