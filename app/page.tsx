@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import ResultTable from './components/ResultTable';
 import type { ResultData, Option } from '@/app/types';
+import Footer from './components/Footer';
 
 export default function Home() {
   const [registrationInput, setRegistrationInput] = useState('');
@@ -480,6 +481,7 @@ export default function Home() {
           </div>
         )}
       </div>
+      <Footer />
     </main>
   );
 }
