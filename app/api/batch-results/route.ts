@@ -1,16 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as cheerio from 'cheerio';
 
+// Configuration from environment variables
 const EXAMS_API_URL = process.env.DUCMC_API_URL || '';
 const USER_AGENT = process.env.DUCMC_USER_AGENT || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
 const REQUEST_DELAY = parseInt(process.env.DUCMC_REQUEST_DELAY || '500');
 const MAX_REGISTRATIONS = parseInt(process.env.DUCMC_MAX_REGISTRATIONS || '60');
 
+// Type definitions
 interface ResultData {
   reg_no: string | number;
   student_name: string;
+  college_name?: string;
+  session?: string;
+  program?: string;
+  exam_roll?: string;
+  class_roll?: string;
+  exam_year?: string;
+  publication_date?: string;
   gpa: number | null;
   cgpa: number | null;
+  status: string; // 'Promoted', 'Passed', 'Failed', etc.
+  failed_subjects: string[];
+  promoted_with_count?: number; // For medical/other exams
   error?: string;
 }
 
@@ -49,26 +61,14 @@ export async function POST(request: NextRequest) {
       parseInt(examId)
     );
 
-    const validResults = results.filter(result => {
-      const hasData = !result.error && 
-                      result.student_name !== 'No data' &&
-                      result.student_name !== 'Error fetching' &&
-                      result.student_name !== 'Error' &&
-                      result.student_name !== 'Not found' &&
-                      result.student_name !== 'Unknown' &&
-                      (result.gpa !== null || result.cgpa !== null);
-      
-      return hasData;
-    });
-
-    const notFoundCount = results.length - validResults.length;
+    const validResults = results.filter(result => !result.error);
 
     return NextResponse.json({
       success: true,
       data: validResults,
       total: results.length,
       successCount: validResults.length,
-      failedCount: notFoundCount
+      failedCount: results.length - validResults.length
     });
 
   } catch (error) {
@@ -141,6 +141,8 @@ async function fetchBatchResults(
         student_name: 'Error fetching',
         gpa: null,
         cgpa: null,
+        status: 'Error',
+        failed_subjects: [],
         error: 'Failed to fetch'
       });
     }
@@ -149,7 +151,6 @@ async function fetchBatchResults(
   return results;
 }
 
-// Fetch single student result
 async function fetchSingleResult(
   regNo: number,
   programId: number,
@@ -186,104 +187,229 @@ async function fetchSingleResult(
         student_name: 'No data',
         gpa: null,
         cgpa: null,
+        status: 'Not Found',
+        failed_subjects: [],
         error: 'No response'
       };
     }
 
+    // Parse the HTML response
     const $ = cheerio.load(html);
     
     const responseText = $('body').text();
     if (responseText.includes('No result found') || 
         responseText.includes('not found') ||
-        responseText.includes('Invalid') ||
-        responseText.includes('No data')) {
+        responseText.includes('Invalid')) {
       return {
         reg_no: regNo,
         student_name: 'Not found',
         gpa: null,
         cgpa: null,
+        status: 'Not Found',
+        failed_subjects: [],
         error: 'No result found'
       };
     }
     
-    // Extract student name
-    let studentName = 'Not found';
-    const nameSelectors = [
-      'th:contains("Student")',
-      'th:contains("Name")', 
-      'th:contains("student")',
-      'th:contains("NAME")'
-    ];
+    // Extract student information
+    let studentName = '';
+    let collegeName = '';
+    let session = '';
+    let program = '';
+    let examRoll = '';
+    let classRoll = '';
+    let examYear = '';
+    let publicationDate = '';
     
-    for (const selector of nameSelectors) {
-      const nameTh = $(selector);
-      if (nameTh.length > 0) {
-        const nameTd = nameTh.next('td');
-        if (nameTd.length > 0) {
-          studentName = nameTd.text().trim();
-          break;
+    $('table tr').each((_, row) => {
+      const th = $(row).find('th');
+      const td = $(row).find('td');
+      if (th.length > 0 && td.length > 0) {
+        const label = th.text().trim();
+        const value = td.text().trim();
+        if (label.includes('Student\'s Name') || label.includes('Student Name')) {
+          studentName = value;
+        } else if (label.includes('College Name')) {
+          collegeName = value;
+        } else if (label.includes('Session')) {
+          session = value;
+        } else if (label.includes('Program')) {
+          program = value;
+        } else if (label.includes('Exam Roll')) {
+          examRoll = value;
+        } else if (label.includes('Class Roll')) {
+          classRoll = value;
+        } else if (label.includes('Exam Year')) {
+          examYear = value;
+        } else if (label.includes('Result Publication Date')) {
+          publicationDate = value;
         }
       }
+    });
+
+    // Extract GPA and CGPA from the HTML
+    let gpa: number | null = null;
+    let cgpa: number | null = null;
+    
+    // Try to find CGPA in the status div
+    const cgpaMatch = responseText.match(/CGPA:\s*([\d.]+)/i);
+    if (cgpaMatch) {
+      cgpa = parseFloat(cgpaMatch[1]);
     }
 
-    // If not found with th/td, try to find in table rows
-    if (studentName === 'Not found') {
+    // Try to find GPA
+    const gpaMatch = responseText.match(/GPA:\s*([\d.]+)/i);
+    if (gpaMatch) {
+      gpa = parseFloat(gpaMatch[1]);
+    }
+
+    // Extract status and failed subjects
+    let status = '';
+    let failedSubjects: string[] = [];
+    let promotedWithCount = 0;
+    
+    // Find the status div
+    const statusDiv = $('td div[style*="font-weight: bold;font-size: 25px;"]');
+    if (statusDiv.length > 0) {
+      const statusText = statusDiv.text().trim();
+      
+      // Check for Promoted with failed subjects
+      if (statusText.includes('Promoted')) {
+        status = 'Promoted';
+        // Extract failed subjects if any
+        const failedMatch = statusText.match(/Promoted\s*\(([^)]+)\)/);
+        if (failedMatch) {
+          const subjects = failedMatch[1].split(',').map(s => s.trim());
+          failedSubjects = subjects.filter(s => s.length > 0);
+          promotedWithCount = failedSubjects.length;
+        }
+      } else if (statusText.includes('Passed')) {
+        status = 'Passed';
+        const failedMatch = statusText.match(/Passed\s*\(([^)]+)\)/);
+        if (failedMatch) {
+          const subjects = failedMatch[1].split(',').map(s => s.trim());
+          failedSubjects = subjects.filter(s => s.length > 0);
+          promotedWithCount = failedSubjects.length;
+        }
+      } else if (statusText.includes('Failed')) {
+        status = 'Failed';
+        const failedMatch = statusText.match(/Failed\s*\(([^)]+)\)/);
+        if (failedMatch) {
+          const subjects = failedMatch[1].split(',').map(s => s.trim());
+          failedSubjects = subjects.filter(s => s.length > 0);
+          promotedWithCount = failedSubjects.length;
+        }
+      } else if (statusText.includes('Conditional')) {
+        status = 'Conditional';
+        const failedMatch = statusText.match(/Conditional\s*\(([^)]+)\)/);
+        if (failedMatch) {
+          const subjects = failedMatch[1].split(',').map(s => s.trim());
+          failedSubjects = subjects.filter(s => s.length > 0);
+          promotedWithCount = failedSubjects.length;
+        }
+      } else {
+        // Try to extract from the div content
+        const lines = statusText.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+        if (lines.length > 0) {
+          status = lines[0];
+          // Check if there are failed subjects mentioned
+          if (lines.length > 1 && lines[1].includes(',')) {
+            const subjects = lines[1].split(',').map(s => s.trim());
+            failedSubjects = subjects.filter(s => s.length > 0);
+            promotedWithCount = failedSubjects.length;
+          }
+        }
+      }
+    } else {
+      // Try to find status in the table
       $('table tr').each((_, row) => {
-        const rowText = $(row).text();
-        if (rowText.includes('Student') || rowText.includes('Name')) {
-          const td = $(row).find('td:last-child');
-          if (td.length > 0) {
-            const name = td.text().trim();
-            if (name && name.length > 0 && !name.includes('Student') && !name.includes('Name')) {
-              studentName = name;
+        const td = $(row).find('td');
+        if (td.length > 0 && td.text().includes('Promoted') || td.text().includes('Passed') || td.text().includes('Failed')) {
+          const text = td.text().trim();
+          if (text.includes('Promoted')) {
+            status = 'Promoted';
+            const failedMatch = text.match(/Promoted\s*\(([^)]+)\)/);
+            if (failedMatch) {
+              const subjects = failedMatch[1].split(',').map(s => s.trim());
+              failedSubjects = subjects.filter(s => s.length > 0);
+              promotedWithCount = failedSubjects.length;
+            }
+          } else if (text.includes('Passed')) {
+            status = 'Passed';
+            const failedMatch = text.match(/Passed\s*\(([^)]+)\)/);
+            if (failedMatch) {
+              const subjects = failedMatch[1].split(',').map(s => s.trim());
+              failedSubjects = subjects.filter(s => s.length > 0);
+              promotedWithCount = failedSubjects.length;
+            }
+          } else if (text.includes('Failed')) {
+            status = 'Failed';
+            const failedMatch = text.match(/Failed\s*\(([^)]+)\)/);
+            if (failedMatch) {
+              const subjects = failedMatch[1].split(',').map(s => s.trim());
+              failedSubjects = subjects.filter(s => s.length > 0);
+              promotedWithCount = failedSubjects.length;
             }
           }
         }
       });
     }
 
-    // Extract GPA
-    let gpa: number | null = null;
-    const gpaMatch = responseText.match(/GPA:\s*([\d.]+)/i);
-    if (gpaMatch) {
-      gpa = parseFloat(gpaMatch[1]);
-    }
-
-    // Extract CGPA
-    let cgpa: number | null = null;
-    const cgpaMatch = responseText.match(/CGPA:\s*([\d.]+)/i);
-    if (cgpaMatch) {
-      cgpa = parseFloat(cgpaMatch[1]);
-    }
-
-    // If GPA or CGPA not found, try alternative patterns in table
-    if (gpa === null || cgpa === null) {
+    // If status is not found, try to determine from the table
+    if (!status) {
+      // Check if there are any failed subjects (grade 'F')
+      let hasF = false;
       $('table tr').each((_, row) => {
-        const rowText = $(row).text();
-        if (rowText.includes('GPA') && !rowText.includes('CGPA')) {
-          const td = $(row).find('td:last-child');
-          if (td.length > 0) {
-            const value = parseFloat(td.text().trim());
-            if (!isNaN(value)) gpa = value;
+        const cells = $(row).find('td');
+        if (cells.length >= 5) {
+          const grade = $(cells[3]).text().trim();
+          if (grade === 'F' || grade === 'F*' || grade === 'F+') {
+            hasF = true;
           }
         }
-        if (rowText.includes('CGPA')) {
-          const td = $(row).find('td:last-child');
-          if (td.length > 0) {
-            const value = parseFloat(td.text().trim());
-            if (!isNaN(value)) cgpa = value;
+      });
+      
+      if (hasF) {
+        status = 'Failed';
+        // Try to get subject codes from the table
+        $('table tr').each((_, row) => {
+          const cells = $(row).find('td');
+          if (cells.length >= 5) {
+            const grade = $(cells[3]).text().trim();
+            if (grade === 'F' || grade === 'F*' || grade === 'F+') {
+              const subjectCode = $(cells[1]).text().trim();
+              if (subjectCode) {
+                failedSubjects.push(subjectCode);
+              }
+            }
           }
+        });
+        promotedWithCount = failedSubjects.length;
+      } else {
+        status = 'Passed';
+      }
+    }
+
+    // If student name is empty, try to find it in the table
+    if (!studentName) {
+      $('table tr').each((_, row) => {
+        const th = $(row).find('th');
+        const td = $(row).find('td');
+        if (th.length > 0 && td.length > 0 && th.text().includes('Student')) {
+          studentName = td.text().trim();
         }
       });
     }
 
     // Check if we have valid data
-    if (studentName === 'Not found' && gpa === null && cgpa === null) {
+    if (!studentName && !cgpa && !gpa && status === '') {
       return {
         reg_no: regNo,
         student_name: 'Not found',
         gpa: null,
         cgpa: null,
+        status: 'Not Found',
+        failed_subjects: [],
         error: 'No result data'
       };
     }
@@ -291,8 +417,18 @@ async function fetchSingleResult(
     return {
       reg_no: regNo,
       student_name: studentName || 'Unknown',
+      college_name: collegeName,
+      session: session,
+      program: program,
+      exam_roll: examRoll,
+      class_roll: classRoll,
+      exam_year: examYear,
+      publication_date: publicationDate,
       gpa: gpa,
-      cgpa: cgpa
+      cgpa: cgpa,
+      status: status || 'Unknown',
+      failed_subjects: failedSubjects,
+      promoted_with_count: promotedWithCount
     };
 
   } catch (error) {
@@ -302,6 +438,8 @@ async function fetchSingleResult(
       student_name: 'Error',
       gpa: null,
       cgpa: null,
+      status: 'Error',
+      failed_subjects: [],
       error: 'Request failed'
     };
   }
