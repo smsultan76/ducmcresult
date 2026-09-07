@@ -5,8 +5,18 @@ import { useState, useEffect } from 'react';
 interface ResultData {
   reg_no: string | number;
   student_name: string;
+  college_name?: string;
+  session?: string;
+  program?: string;
+  exam_roll?: string;
+  class_roll?: string;
+  exam_year?: string;
+  publication_date?: string;
   gpa: number | null;
   cgpa: number | null;
+  status: string;
+  failed_subjects: string[];
+  promoted_with_count?: number;
   error?: string;
 }
 
@@ -25,7 +35,6 @@ export default function ResultTable({ results, programName, sessionName, examNam
   
   const [sortedResults, setSortedResults] = useState<ResultData[]>([]);
 
-  // Update sorted results when results change
   useEffect(() => {
     setSortedResults([...results]);
   }, [results]);
@@ -40,18 +49,15 @@ export default function ResultTable({ results, programName, sessionName, examNam
     setSortConfig({ key, direction });
 
     const sorted = [...results].sort((a, b) => {
-      // Handle null/undefined values
       if (a[key] === null || a[key] === undefined) return 1;
       if (b[key] === null || b[key] === undefined) return -1;
 
-      // String comparison
       if (typeof a[key] === 'string' && typeof b[key] === 'string') {
         return direction === 'ascending' 
           ? (a[key] as string).localeCompare(b[key] as string)
           : (b[key] as string).localeCompare(a[key] as string);
       }
 
-      // Number comparison
       if (a[key]! < b[key]!) {
         return direction === 'ascending' ? -1 : 1;
       }
@@ -69,7 +75,14 @@ export default function ResultTable({ results, programName, sessionName, examNam
     return sortConfig.direction === 'ascending' ? '↑' : '↓';
   };
 
-  // Get GPA color class
+  const getStatusColor = (status: string) => {
+    if (status === 'Promoted') return 'bg-green-100 text-green-800';
+    if (status === 'Passed') return 'bg-blue-100 text-blue-800';
+    if (status === 'Failed') return 'bg-red-100 text-red-800';
+    if (status === 'Conditional') return 'bg-yellow-100 text-yellow-800';
+    return 'bg-gray-100 text-gray-800';
+  };
+
   const getGpaColorClass = (gpa: number | null) => {
     if (gpa === null) return 'text-gray-400';
     if (gpa >= 3.5) return 'text-green-600 font-semibold';
@@ -98,15 +111,15 @@ export default function ResultTable({ results, programName, sessionName, examNam
             <tr>
               <th
                 onClick={() => sortResults('reg_no')}
-                className="px-4 py-2 text-left text-xs font-semibold text-purple-700 uppercase tracking-wider cursor-pointer hover:bg-purple-100 select-none"
+                className="px-3 py-2 text-left text-xs font-semibold text-purple-700 uppercase tracking-wider cursor-pointer hover:bg-purple-100 select-none"
               >
                 <span className="flex items-center gap-1">
-                  Registration {getSortIndicator('reg_no')}
+                  Reg. No {getSortIndicator('reg_no')}
                 </span>
               </th>
               <th
                 onClick={() => sortResults('student_name')}
-                className="px-4 py-2 text-left text-xs font-semibold text-purple-700 uppercase tracking-wider cursor-pointer hover:bg-purple-100 select-none"
+                className="px-3 py-2 text-left text-xs font-semibold text-purple-700 uppercase tracking-wider cursor-pointer hover:bg-purple-100 select-none"
               >
                 <span className="flex items-center gap-1">
                   Student Name {getSortIndicator('student_name')}
@@ -114,7 +127,7 @@ export default function ResultTable({ results, programName, sessionName, examNam
               </th>
               <th
                 onClick={() => sortResults('gpa')}
-                className="px-4 py-2 text-center text-xs font-semibold text-purple-700 uppercase tracking-wider cursor-pointer hover:bg-purple-100 select-none"
+                className="px-3 py-2 text-center text-xs font-semibold text-purple-700 uppercase tracking-wider cursor-pointer hover:bg-purple-100 select-none"
               >
                 <span className="flex items-center justify-center gap-1">
                   GPA {getSortIndicator('gpa')}
@@ -122,14 +135,22 @@ export default function ResultTable({ results, programName, sessionName, examNam
               </th>
               <th
                 onClick={() => sortResults('cgpa')}
-                className="px-4 py-2 text-center text-xs font-semibold text-purple-700 uppercase tracking-wider cursor-pointer hover:bg-purple-100 select-none"
+                className="px-3 py-2 text-center text-xs font-semibold text-purple-700 uppercase tracking-wider cursor-pointer hover:bg-purple-100 select-none"
               >
                 <span className="flex items-center justify-center gap-1">
                   CGPA {getSortIndicator('cgpa')}
                 </span>
               </th>
-              <th className="px-4 py-2 text-center text-xs font-semibold text-purple-700 uppercase tracking-wider">
-                Status
+              <th
+                onClick={() => sortResults('status')}
+                className="px-3 py-2 text-center text-xs font-semibold text-purple-700 uppercase tracking-wider cursor-pointer hover:bg-purple-100 select-none"
+              >
+                <span className="flex items-center justify-center gap-1">
+                  Status {getSortIndicator('status')}
+                </span>
+              </th>
+              <th className="px-3 py-2 text-center text-xs font-semibold text-purple-700 uppercase tracking-wider">
+                Failed Subjects
               </th>
             </tr>
           </thead>
@@ -139,22 +160,34 @@ export default function ResultTable({ results, programName, sessionName, examNam
                 key={`${result.reg_no}-${index}`}
                 className={index % 2 === 0 ? 'bg-white hover:bg-purple-50' : 'bg-gray-50 hover:bg-purple-50'}
               >
-                <td className="px-4 py-1.5 whitespace-nowrap text-sm font-medium text-gray-900">
+                <td className="px-3 py-1.5 whitespace-nowrap text-sm font-medium text-gray-900">
                   {result.reg_no}
                 </td>
-                <td className="px-4 py-1.5 whitespace-nowrap text-sm text-gray-700">
+                <td className="px-3 py-1.5 whitespace-nowrap text-sm text-gray-700">
                   {result.student_name}
                 </td>
-                <td className={`px-4 py-1.5 whitespace-nowrap text-sm text-center font-medium ${getGpaColorClass(result.gpa)}`}>
+                <td className={`px-3 py-1.5 whitespace-nowrap text-sm text-center font-medium ${getGpaColorClass(result.gpa)}`}>
                   {result.gpa !== null ? result.gpa.toFixed(2) : 'N/A'}
                 </td>
-                <td className={`px-4 py-1.5 whitespace-nowrap text-sm text-center font-medium ${getGpaColorClass(result.cgpa)}`}>
+                <td className={`px-3 py-1.5 whitespace-nowrap text-sm text-center font-medium ${getGpaColorClass(result.cgpa)}`}>
                   {result.cgpa !== null ? result.cgpa.toFixed(2) : 'N/A'}
                 </td>
-                <td className="px-4 py-1.5 whitespace-nowrap text-center">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    Found
+                <td className="px-3 py-1.5 whitespace-nowrap text-center">
+                  <span className={`px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(result.status)}`}>
+                    {result.status}
+                    {result.promoted_with_count && result.promoted_with_count > 0 && (
+                      <span className="ml-1 text-red-600">({result.promoted_with_count})</span>
+                    )}
                   </span>
+                </td>
+                <td className="px-3 py-1.5 whitespace-nowrap text-center text-xs text-gray-600">
+                  {result.failed_subjects.length > 0 ? (
+                    <span className="text-red-600 font-medium">
+                      {result.failed_subjects.join(', ')}
+                    </span>
+                  ) : (
+                    <span className="text-gray-400">-</span>
+                  )}
                 </td>
               </tr>
             ))}
@@ -163,11 +196,11 @@ export default function ResultTable({ results, programName, sessionName, examNam
       </div>
       
       {/* Table Footer */}
-      <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center">
-        <div className="text-sm text-gray-600">
+      <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-sm">
+        <div className="text-gray-600">
           Showing <strong>{sortedResults.length}</strong> student(s)
         </div>
-        <div className="text-sm text-gray-400 hidden sm:block">
+        <div className="text-gray-400 text-xs hidden sm:block">
           Click column headers to sort ↕
         </div>
       </div>
