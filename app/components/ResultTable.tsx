@@ -1,24 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
-interface ResultData {
-  reg_no: string | number;
-  student_name: string;
-  college_name?: string;
-  session?: string;
-  program?: string;
-  exam_roll?: string;
-  class_roll?: string;
-  exam_year?: string;
-  publication_date?: string;
-  gpa: number | null;
-  cgpa: number | null;
-  status: string;
-  failed_subjects: string[];
-  promoted_with_count?: number;
-  error?: string;
-}
+import type { ResultData } from '@/app/types';
 
 interface ResultTableProps {
   results: ResultData[];
@@ -149,9 +132,9 @@ export default function ResultTable({ results, programName, sessionName, examNam
                   Status {getSortIndicator('status')}
                 </span>
               </th>
-              <th className="px-3 py-2 text-center text-xs font-semibold text-purple-700 uppercase tracking-wider">
+              {/* <th className="px-3 py-2 text-center text-xs font-semibold text-purple-700 uppercase tracking-wider">
                 Failed Subjects
-              </th>
+              </th> */}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -175,12 +158,12 @@ export default function ResultTable({ results, programName, sessionName, examNam
                 <td className="px-3 py-1.5 whitespace-nowrap text-center">
                   <span className={`px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(result.status)}`}>
                     {result.status}
-                    {result.promoted_with_count && result.promoted_with_count > 0 && (
+                    {/* {result.promoted_with_count && result.promoted_with_count > 0 && (
                       <span className="ml-1 text-red-600">({result.promoted_with_count})</span>
-                    )}
+                    )} */}
                   </span>
                 </td>
-                <td className="px-3 py-1.5 whitespace-nowrap text-center text-xs text-gray-600">
+                {/* <td className="px-3 py-1.5 whitespace-nowrap text-center text-xs text-gray-600">
                   {result.failed_subjects.length > 0 ? (
                     <span className="text-red-600 font-medium">
                       {result.failed_subjects.join(', ')}
@@ -188,7 +171,7 @@ export default function ResultTable({ results, programName, sessionName, examNam
                   ) : (
                     <span className="text-gray-400">-</span>
                   )}
-                </td>
+                </td> */}
               </tr>
             ))}
           </tbody>

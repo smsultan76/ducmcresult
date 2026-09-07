@@ -1,31 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-interface ResultData {
-  reg_no: string | number;
-  student_name: string;
-  college_name?: string;
-  session?: string;
-  program?: string;
-  exam_roll?: string;
-  class_roll?: string;
-  exam_year?: string;
-  publication_date?: string;
-  gpa: number | null;
-  cgpa: number | null;
-  status: string;
-  failed_subjects: string[];
-  promoted_with_count?: number;
-  error?: string;
-}
-
-interface PrintData {
-  results: ResultData[];
-  program: string;
-  session: string;
-  exam: string;
-}
+import type { PrintData  } from '@/app/types';
 
 export default function PrintPage() {
   const [data, setData] = useState<PrintData | null>(null);
@@ -112,7 +88,7 @@ export default function PrintPage() {
 
       <div className="print-footer">
         <p>© {new Date().getFullYear()} University of Dhaka. All Rights Reserved.</p>
-        <p>Developed by: <a href="https://sultanum-mobin.vercel.app/" target="_blank" className="text-blue-600">Sultanum Mobin</a></p>
+        <p>Downloaded from: <a href="https://ducmcresult.vercel.app/" target="_blank" className="text-blue-600">DUCMC Results</a></p>
       </div>
 
       <style jsx>{`
