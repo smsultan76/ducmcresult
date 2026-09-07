@@ -5,8 +5,18 @@ import { useEffect, useState } from 'react';
 interface ResultData {
   reg_no: string | number;
   student_name: string;
+  college_name?: string;
+  session?: string;
+  program?: string;
+  exam_roll?: string;
+  class_roll?: string;
+  exam_year?: string;
+  publication_date?: string;
   gpa: number | null;
   cgpa: number | null;
+  status: string;
+  failed_subjects: string[];
+  promoted_with_count?: number;
   error?: string;
 }
 
@@ -46,6 +56,14 @@ export default function PrintPage() {
 
   const { results, program, session, exam } = data;
 
+  const getStatusColor = (status: string) => {
+    if (status === 'Promoted') return '#065f46';
+    if (status === 'Passed') return '#1e40af';
+    if (status === 'Failed') return '#991b1b';
+    if (status === 'Conditional') return '#92400e';
+    return '#4b5563';
+  };
+
   return (
     <div className="print-container">
       <div className="print-header">
@@ -63,11 +81,12 @@ export default function PrintPage() {
       <table className="print-table">
         <thead>
           <tr>
-            <th>Registration</th>
+            <th>Reg. No</th>
             <th>Student Name</th>
             <th>GPA</th>
             <th>CGPA</th>
             <th>Status</th>
+            {/* <th>Failed Subjects</th> */}
           </tr>
         </thead>
         <tbody>
@@ -77,7 +96,15 @@ export default function PrintPage() {
               <td>{result.student_name}</td>
               <td>{result.gpa !== null ? result.gpa.toFixed(2) : 'N/A'}</td>
               <td>{result.cgpa !== null ? result.cgpa.toFixed(2) : 'N/A'}</td>
-              <td>Found</td>
+              <td style={{ color: getStatusColor(result.status), fontWeight: 'bold' }}>
+                {result.status}
+                {/* {result.promoted_with_count && result.promoted_with_count > 0 && (
+                  <span style={{ color: '#991b1b' }}>({result.promoted_with_count})</span>
+                )} */}
+              </td>
+              {/* <td style={{ color: '#991b1b' }}>
+                {result.failed_subjects.length > 0 ? result.failed_subjects.join(', ') : '-'}
+              </td> */}
             </tr>
           ))}
         </tbody>
@@ -118,7 +145,7 @@ export default function PrintPage() {
           display: grid;
           grid-template-columns: 1fr 1fr;
           gap: 5px 30px;
-          max-width: 600px;
+          // max-width: 600px;
           margin: 10px auto 0;
           font-size: 13px;
           text-align: left;
@@ -131,7 +158,7 @@ export default function PrintPage() {
         .print-table {
           width: 100%;
           border-collapse: collapse;
-          font-size: 12px;
+          font-size: 11px;
           margin: 15px 0;
         }
 
@@ -142,17 +169,17 @@ export default function PrintPage() {
         .print-table th {
           background-color: #f3e8ff;
           border: 1px solid #ccc;
-          padding: 8px 10px;
+          padding: 6px 8px;
           text-align: left;
           font-weight: bold;
-          font-size: 11px;
+          font-size: 10px;
           text-transform: uppercase;
         }
 
         .print-table td {
           border: 1px solid #ddd;
-          padding: 6px 10px;
-          font-size: 11px;
+          padding: 5px 8px;
+          font-size: 10px;
         }
 
         .print-table tr:nth-child(even) {
@@ -168,7 +195,7 @@ export default function PrintPage() {
           border-top: 2px solid #7c3aed;
           padding-top: 15px;
           margin-top: 20px;
-          font-size: 11px;
+          font-size: 10px;
           color: #666;
         }
 
@@ -184,45 +211,37 @@ export default function PrintPage() {
           }
 
           .print-container {
-            padding: 15px 20px;
-          }
-
-          .print-header {
-            padding-bottom: 12px;
-            margin-bottom: 15px;
+            padding: 10px 15px;
           }
 
           .print-header h1 {
-            font-size: 20px;
+            font-size: 18px;
           }
 
           .print-header h2 {
-            font-size: 16px;
+            font-size: 14px;
           }
 
           .print-info {
-            font-size: 11px;
-            gap: 3px 25px;
-          }
-
-          .print-table {
             font-size: 10px;
           }
 
-          .print-table th {
+          .print-table {
             font-size: 9px;
-            padding: 6px 8px;
+          }
+
+          .print-table th {
+            font-size: 8px;
+            padding: 4px 6px;
           }
 
           .print-table td {
-            font-size: 9px;
-            padding: 4px 8px;
+            font-size: 8px;
+            padding: 3px 6px;
           }
 
           .print-footer {
-            font-size: 9px;
-            padding-top: 10px;
-            margin-top: 15px;
+            font-size: 8px;
           }
 
           .print-table {
@@ -248,12 +267,12 @@ export default function PrintPage() {
           }
 
           .print-table {
-            font-size: 10px;
+            font-size: 9px;
           }
 
           .print-table th,
           .print-table td {
-            padding: 4px 6px;
+            padding: 3px 4px;
           }
         }
       `}</style>
