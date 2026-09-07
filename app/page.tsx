@@ -2,19 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import ResultTable from './components/ResultTable';
-
-interface ResultData {
-  reg_no: string | number;
-  student_name: string;
-  gpa: number | null;
-  cgpa: number | null;
-  error?: string;
-}
-
-interface Option {
-  id: string;
-  name: string;
-}
+import type { ResultData, Option } from '@/app/types';
 
 export default function Home() {
   const [registrationInput, setRegistrationInput] = useState('');
@@ -46,6 +34,7 @@ export default function Home() {
   
   const tableRef = useRef<HTMLDivElement>(null);
 
+  // Fetch programs and sessions on component mount
   useEffect(() => {
     const fetchOptions = async () => {
       try {
@@ -69,6 +58,7 @@ export default function Home() {
     fetchOptions();
   }, []);
 
+  // Fetch exams when program changes
   useEffect(() => {
     const fetchExams = async () => {
       if (!programId) {
@@ -111,6 +101,7 @@ export default function Home() {
       }
     };
 
+    // Add a small delay to avoid rapid requests
     const timeoutId = setTimeout(() => {
       fetchExams();
     }, 300);
@@ -120,7 +111,7 @@ export default function Home() {
 
   const handleProgramChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setProgramId(e.target.value);
-    setExamId('');
+    setExamId(''); // Reset exam when program changes
     setExamError(null);
   };
 
@@ -132,6 +123,7 @@ export default function Home() {
       return;
     }
 
+    // Get selected names for caption
     const program = programs.find(p => p.id === programId);
     const session = sessions.find(s => s.id === sessionId);
     const exam = exams.find(e => e.id === examId);
@@ -165,6 +157,7 @@ export default function Home() {
       if (!data.success) {
         setError(data.error || 'Failed to fetch results');
       } else {
+        // Filter out results with errors or missing data
         const validResults = data.data.filter((result: ResultData) => {
           const hasError = result.error || 
                           (result.gpa === null && result.cgpa === null) ||
@@ -228,6 +221,7 @@ export default function Home() {
     }
   };
 
+  // Simulate progress updates from API
   useEffect(() => {
     if (loading) {
       let currentProgress = 0;
@@ -247,7 +241,7 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
         {/* Header */}
         <div className="mb-4 sm:mb-8 no-print">
-          <img src="/ducmc.png" alt="" className="mx-auto"/>
+          <img src="/ducmc.png" alt="DU CMC Logo" className="mx-auto max-w-xs sm:max-w-md"/>
         </div>
 
         {/* Input Form - Hidden when printing */}

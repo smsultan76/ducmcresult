@@ -1,30 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as cheerio from 'cheerio';
+import type { ResultData } from '@/app/types';
 
-// Configuration from environment variables
 const EXAMS_API_URL = process.env.DUCMC_API_URL || '';
 const USER_AGENT = process.env.DUCMC_USER_AGENT || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
 const REQUEST_DELAY = parseInt(process.env.DUCMC_REQUEST_DELAY || '500');
 const MAX_REGISTRATIONS = parseInt(process.env.DUCMC_MAX_REGISTRATIONS || '60');
-
-// Type definitions
-interface ResultData {
-  reg_no: string | number;
-  student_name: string;
-  college_name?: string;
-  session?: string;
-  program?: string;
-  exam_roll?: string;
-  class_roll?: string;
-  exam_year?: string;
-  publication_date?: string;
-  gpa: number | null;
-  cgpa: number | null;
-  status: string; // 'Promoted', 'Passed', 'Failed', etc.
-  failed_subjects: string[];
-  promoted_with_count?: number; // For medical/other exams
-  error?: string;
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -211,7 +192,6 @@ async function fetchSingleResult(
       };
     }
     
-    // Extract student information
     let studentName = '';
     let collegeName = '';
     let session = '';
@@ -321,10 +301,9 @@ async function fetchSingleResult(
         }
       }
     } else {
-      // Try to find status in the table
       $('table tr').each((_, row) => {
         const td = $(row).find('td');
-        if (td.length > 0 && td.text().includes('Promoted') || td.text().includes('Passed') || td.text().includes('Failed')) {
+        if (td.length > 0 && (td.text().includes('Promoted') || td.text().includes('Passed') || td.text().includes('Failed'))) {
           const text = td.text().trim();
           if (text.includes('Promoted')) {
             status = 'Promoted';
@@ -355,9 +334,7 @@ async function fetchSingleResult(
       });
     }
 
-    // If status is not found, try to determine from the table
     if (!status) {
-      // Check if there are any failed subjects (grade 'F')
       let hasF = false;
       $('table tr').each((_, row) => {
         const cells = $(row).find('td');
@@ -371,7 +348,6 @@ async function fetchSingleResult(
       
       if (hasF) {
         status = 'Failed';
-        // Try to get subject codes from the table
         $('table tr').each((_, row) => {
           const cells = $(row).find('td');
           if (cells.length >= 5) {
@@ -390,7 +366,6 @@ async function fetchSingleResult(
       }
     }
 
-    // If student name is empty, try to find it in the table
     if (!studentName) {
       $('table tr').each((_, row) => {
         const th = $(row).find('th');
@@ -401,7 +376,6 @@ async function fetchSingleResult(
       });
     }
 
-    // Check if we have valid data
     if (!studentName && !cgpa && !gpa && status === '') {
       return {
         reg_no: regNo,
