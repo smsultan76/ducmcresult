@@ -9,10 +9,11 @@ import {
 import { 
   faCode, 
   faUser, 
-  faEnvelope, 
   faExternalLinkAlt,
-  faHeart
+  faHeart,
+  faPaperPlane
 } from '@fortawesome/free-solid-svg-icons';
+import { faMessage } from '@fortawesome/free-solid-svg-icons/faMessage';
 
 export default function Footer() {
   return (
@@ -24,7 +25,7 @@ export default function Footer() {
           {/* Open Source Section */}
           <div className="text-left col-span-2 lg:ml-24">
             <h3 className="text-sm font-semibold text-purple-400 uppercase tracking-wider mb-2">
-              <FontAwesomeIcon icon={faCode} className="text-purple-400" />
+              <FontAwesomeIcon icon={faCode} className="text-purple-400 mr-2" />
               Open Source
             </h3>
             <p className="text-gray-200 text-xs leading-relaxed">
@@ -34,7 +35,7 @@ export default function Footer() {
               href="https://github.com/smsultan76/ducmcresult.git"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-purple-400 hover:text-purple-300 text-xs mt-1 transition-colors"
+              className="text-purple-400 hover:text-blue-500 text-xs mt-1 transition-colors"
             >
               <FontAwesomeIcon icon={faGithub} className='mr-2'/>
                View Source Code
@@ -44,16 +45,16 @@ export default function Footer() {
           {/* Contact Section */}
           <div className="text-left sm:text-left">
             <h3 className="text-sm font-semibold text-purple-400 uppercase tracking-wider mb-2">
-              <FontAwesomeIcon icon={faEnvelope} className="text-purple-400" />
+              <FontAwesomeIcon icon={faMessage} className="text-purple-400 mr-2" />
               Contact
             </h3>
             <a
               href="https://sultanum-mobin.vercel.app/contact"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white hover:text-purple-300 text-xs transition-colors"
+              className="text-white hover:text-blue-500 text-xs transition-colors"
             >
-              <FontAwesomeIcon icon={faEnvelope} />
+              <FontAwesomeIcon icon={faPaperPlane} className='mr-2'/>
               Contact With Developer
             </a>
           </div>
