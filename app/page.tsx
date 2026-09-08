@@ -254,9 +254,9 @@ export default function Home() {
     <>
       <Head>
         <title>DU CMC Result System - Batch Result Lookup</title>
-        <meta name="description" content="Check DU CMC results online. Batch result lookup for Dhaka University Constituent Medical College. Search by registration number, program, session, and exam." />
+        <meta name="description" content="Check DU CMC results online. Batch result lookup for Dhaka University Constituent Engineering College and Medical College. Search by registration number, program, session, and exam." />
         <meta property="og:title" content="DU CMC Result System - Batch Result Lookup" />
-        <meta property="og:description" content="Check DU CMC results online. Batch result lookup for Dhaka University Constituent Medical College." />
+        <meta property="og:description" content="Check DU CMC results online. Batch result lookup for Dhaka University Constituent Engineering College and Medical College." />
       </Head>
       <main className="min-h-screen bg-gray-50 sm:pt-6">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
@@ -267,7 +267,7 @@ export default function Home() {
 
           {/* Input Form - Hidden when printing */}
           <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 mb-4 sm:mb-8 no-print">
-            <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4" id='result-section'>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {/* Registration Number Input */}
                 <div className="sm:col-span-2">
@@ -500,6 +500,50 @@ export default function Home() {
               </p>
             </div>
           )}
+          {/* SEO Content Section */}
+          <div className="mt-8 bg-white rounded-lg shadow p-6 no-print">
+            <h2 className="text-xl font-bold text-purple-800 mb-4">
+              About DU CMC Result System
+            </h2>
+            <div className="prose prose-sm max-w-none text-gray-600 space-y-3">
+              <p>
+                The DU CMC Result System is an online platform for students of Dhaka University 
+                Constituent Medical College to check their academic results. This system allows 
+                students to view their results by registration number, program, session, and exam name.
+              </p>
+              <p>
+                With the batch result lookup feature, users can check results for multiple students 
+                at once, making it ideal for educational institutions and administrators.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                <div>
+                  <h3 className="font-semibold text-purple-700">Key Features</h3>
+                  <ul className="list-disc list-inside text-sm space-y-1">
+                    <li>Batch result fetching for up to 60 students</li>
+                    <li>Support for single, multiple, and range registrations</li>
+                    <li>Sortable results table</li>
+                    <li>Print-friendly format</li>
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-purple-700">Quick Links</h3>
+                  <ul className="list-disc list-inside text-sm space-y-1">
+                    <li>
+                      <a href="/" className="text-purple-600 hover:underline">Home</a>
+                    </li>
+                    <li>
+                      <a href="#result-section" className="text-purple-600 hover:underline">Check Results</a>
+                    </li>
+                    <li>
+                      <a href="https://ducmc.du.ac.bd" target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">
+                        Official DU CMC Site
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <Footer />
       </main>
