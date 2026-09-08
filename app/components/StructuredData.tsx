@@ -10,7 +10,7 @@ export default function StructuredData() {
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "DU CMC Result System",
-      "description": "Batch result lookup for Dhaka University Constituent Engineering College and Medical College",
+      "description": "Batch result lookup for Dhaka University Constituent Engineering Colleges and Medical Colleges",
       "applicationCategory": "Educational Application",
       "operatingSystem": "All",
       "url": "https://ducmcresult.vercel.app",

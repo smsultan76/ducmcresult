@@ -1,7 +1,7 @@
 {
   "name": "DU CMC Result System",
   "short_name": "DU CMC Results",
-  "description": "Check DU CMC results online. Batch result lookup for Dhaka University Constituent Engineering College and Medical College.",
+  "description": "Check DU CMC results online. Batch result lookup for Dhaka University Constituent Engineering Colleges and Medical Colleges.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#7c3aed",

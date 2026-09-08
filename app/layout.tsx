@@ -19,10 +19,10 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL('https://ducmcresult.vercel.app'),
   title: {
-    default: 'DU CMC Result System - Dhaka University Constituent Engineering College and Medical College',
+    default: 'DU CMC Result System - Dhaka University Constituent Engineering Colleges and Medical Colleges',
     template: '%s | DU CMC Result System'
   },
-  description: 'Check DU CMC results online. Batch result lookup for Dhaka University Constituent Engineering College and Medical College. Search by registration number, program, session, and exam.',
+  description: 'Check DU CMC results online. Batch result lookup for Dhaka University Constituent Engineering Colleges and Medical Colleges. Search by registration number, program, session, and exam.',
   keywords: [
     'DU CMC',
     'Dhaka University',
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     { name: 'Sultanum Mobin', url: 'https://sultanum-mobin.vercel.app/' }
   ],
   creator: 'Sultanum Mobin',
-  publisher: 'Dhaka University Constituent Engineering College and Medical College',
+  publisher: 'Dhaka University Constituent Engineering Colleges and Medical Colleges',
   robots: {
     index: true,
     follow: true,
@@ -62,8 +62,8 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://ducmcresult.vercel.app',
     siteName: 'DU CMC Result System',
-    title: 'DU CMC Result System - Dhaka University Constituent Engineering College and Medical College',
-    description: 'Check DU CMC results online. Batch result lookup for Dhaka University Constituent Engineering College and Medical College.',
+    title: 'DU CMC Result System - Dhaka University Constituent Engineering Colleges and Medical Colleges',
+    description: 'Check DU CMC results online. Batch result lookup for Dhaka University Constituent Engineering Colleges and Medical Colleges.',
     images: [
       {
         url: '/og-image.jpg',
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'DU CMC Result System',
-    description: 'Check DU CMC results online. Batch result lookup for Dhaka University Constituent Engineering College and Medical College.',
+    description: 'Check DU CMC results online. Batch result lookup for Dhaka University Constituent Engineering Colleges and Medical Colleges.',
     images: ['/og-image.jpg'],
     creator: '@smsultan76',
   },

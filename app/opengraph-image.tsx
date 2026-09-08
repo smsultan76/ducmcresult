@@ -30,7 +30,7 @@ export default async function Image() {
           DU CMC Result System
         </div>
         <div style={{ fontSize: 28, opacity: 0.9 }}>
-          Dhaka University Constituent Engineering College and Medical College
+          Dhaka University Constituent Engineering Colleges and Medical Colleges
         </div>
         <div style={{ fontSize: 20, marginTop: 30, opacity: 0.7 }}>
           Batch Result Lookup • Check Your Results Online

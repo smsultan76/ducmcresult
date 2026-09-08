@@ -254,9 +254,9 @@ export default function Home() {
     <>
       <Head>
         <title>DU CMC Result System - Batch Result Lookup</title>
-        <meta name="description" content="Check DU CMC results online. Batch result lookup for Dhaka University Constituent Engineering College and Medical College. Search by registration number, program, session, and exam." />
+        <meta name="description" content="Check DU CMC results online. Batch result lookup for Dhaka University Constituent Engineering Colleges and Medical Colleges. Search by registration number, program, session, and exam." />
         <meta property="og:title" content="DU CMC Result System - Batch Result Lookup" />
-        <meta property="og:description" content="Check DU CMC results online. Batch result lookup for Dhaka University Constituent Engineering College and Medical College." />
+        <meta property="og:description" content="Check DU CMC results online. Batch result lookup for Dhaka University Constituent Engineering Colleges and Medical Colleges." />
       </Head>
       <main className="min-h-screen bg-gray-50 sm:pt-6">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
@@ -508,7 +508,7 @@ export default function Home() {
             <div className="prose prose-sm max-w-none text-gray-600 space-y-3">
               <p>
                 The DU CMC Result System is an online platform for students of Dhaka University 
-                Constituent Medical College to check their academic results. This system allows 
+                Constituent Enginnering Colleges and Medical Colleges to check their academic results. This system allows 
                 students to view their results by registration number, program, session, and exam name.
               </p>
               <p>
