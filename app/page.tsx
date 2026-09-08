@@ -25,14 +25,14 @@ export default function Home() {
     session: string;
     exam: string;
   } | null>(null);
-  
+
   const [programs, setPrograms] = useState<Option[]>([]);
   const [sessions, setSessions] = useState<Option[]>([]);
   const [exams, setExams] = useState<Option[]>([]);
   const [loadingOptions, setLoadingOptions] = useState(true);
   const [loadingExams, setLoadingExams] = useState(false);
   const [examError, setExamError] = useState<string | null>(null);
-  
+
   const tableRef = useRef<HTMLDivElement>(null);
 
   // Fetch programs and sessions on component mount
@@ -41,7 +41,7 @@ export default function Home() {
       try {
         const response = await fetch('/api/options');
         const data = await response.json();
-        
+
         if (data.success) {
           setPrograms(data.programs);
           setSessions(data.sessions);
@@ -71,14 +71,14 @@ export default function Home() {
       setLoadingExams(true);
       setExamError(null);
       setExamId(''); // Reset selected exam
-      
+
       try {
         console.log(`Fetching exams for program: ${programId}`);
         const response = await fetch(`/api/exams?program_id=${programId}`);
         const data = await response.json();
-        
+
         console.log('Exams response:', data);
-        
+
         if (data.success) {
           if (data.exams && data.exams.length > 0) {
             setExams(data.exams);
@@ -118,7 +118,7 @@ export default function Home() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!registrationInput || !programId || !sessionId || !examId) {
       setError('All fields are required');
       return;
@@ -128,7 +128,7 @@ export default function Home() {
     const program = programs.find(p => p.id === programId);
     const session = sessions.find(s => s.id === sessionId);
     const exam = exams.find(e => e.id === examId);
-    
+
     setSelectedProgram(program?.name || '');
     setSelectedSession(session?.name || '');
     setSelectedExam(exam?.name || '');
@@ -160,14 +160,14 @@ export default function Home() {
       } else {
         // Filter out results with errors or missing data
         const validResults = data.data.filter((result: ResultData) => {
-          const hasError = result.error || 
-                          (result.gpa === null && result.cgpa === null) ||
-                          result.student_name === 'No data' ||
-                          result.student_name === 'Error fetching' ||
-                          result.student_name === 'Error' ||
-                          result.student_name === 'Not found' ||
-                          result.student_name === 'Unknown';
-          
+          const hasError = result.error ||
+            (result.gpa === null && result.cgpa === null) ||
+            result.student_name === 'No data' ||
+            result.student_name === 'Error fetching' ||
+            result.student_name === 'Error' ||
+            result.student_name === 'Not found' ||
+            result.student_name === 'Unknown';
+
           if (hasError) {
             setNotFoundRegistrations(prev => [...prev, Number(result.reg_no)]);
           }
@@ -182,7 +182,7 @@ export default function Home() {
           exam: exam?.name || ''
         });
         setProgress(100);
-        
+
         if (validResults.length === 0 && data.data.length > 0) {
           setError('No valid results found for the provided registrations');
         } else if (data.failedCount > 0) {
@@ -218,7 +218,12 @@ export default function Home() {
   const handlePrint = () => {
     if (printData) {
       localStorage.setItem('printData', JSON.stringify(printData));
-      window.open('/print', '_blank');
+      const printWindow = window.open('/print', '_blank');
+      if (!printWindow) {
+        window.location.href = '/print';
+      }
+    } else {
+      setError('No data to print. Please fetch results first.');
     }
   };
 
@@ -242,7 +247,7 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
         {/* Header */}
         <div className="mb-4 sm:mb-8 no-print">
-          <img src="/ducmc.png" alt="DU CMC Logo" className="mx-auto max-w-xs sm:max-w-md"/>
+          <img src="/ducmc.png" alt="DU CMC Logo" className="mx-auto max-w-xs sm:max-w-md" />
         </div>
 
         {/* Input Form - Hidden when printing */}
@@ -341,7 +346,7 @@ export default function Home() {
                     </option>
                   ))}
                 </select>
-                
+
                 {/* Loading state */}
                 {loadingExams && (
                   <p className="mt-1 text-xs text-blue-600">
@@ -349,20 +354,20 @@ export default function Home() {
                     Loading exams...
                   </p>
                 )}
-                
+
                 {/* Error/Info states */}
                 {!loadingExams && programId && exams.length === 0 && (
                   <p className="mt-1 text-xs text-yellow-600">
                     ⚠️ {examError || 'No exams available for this program. Please try another program.'}
                   </p>
                 )}
-                
+
                 {!programId && (
                   <p className="mt-1 text-xs text-gray-400">
                     Please select a program first
                   </p>
                 )}
-                
+
                 {/* Success state */}
                 {!loadingExams && programId && exams.length > 0 && (
                   <p className="mt-1 text-xs text-green-600">
@@ -406,7 +411,7 @@ export default function Home() {
                   <span>{Math.round(progress)}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                  <div 
+                  <div
                     className="bg-gradient-to-r from-purple-400 via-purple-600 to-purple-800 h-2 rounded-full transition-all duration-500 ease-out"
                     style={{ width: `${progress}%` }}
                   />
@@ -461,8 +466,8 @@ export default function Home() {
         {/* Results Table */}
         {results.length > 0 && (
           <div ref={tableRef}>
-            <ResultTable 
-              results={results} 
+            <ResultTable
+              results={results}
               programName={selectedProgram}
               sessionName={selectedSession}
               examName={selectedExam}
