@@ -238,7 +238,7 @@ export default function Home() {
   }, [loading]);
 
   return (
-    <main className="min-h-screen bg-gray-50 sm:py-8">
+    <main className="min-h-screen bg-gray-50 sm:pt-6">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
         {/* Header */}
         <div className="mb-4 sm:mb-8 no-print">
@@ -377,7 +377,7 @@ export default function Home() {
               <button
                 type="submit"
                 disabled={loading || loadingOptions || loadingExams || !examId || exams.length === 0}
-                className="flex-1 bg-purple-600 text-white px-3 sm:px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
+                className="flex-1 bg-purple-600 text-white px-3 sm:px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base cursor-pointer"
               >
                 {loading ? (
                   <>
@@ -391,7 +391,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={handleClear}
-                className="bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors text-sm sm:text-base"
+                className="bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors text-sm sm:text-base cursor-pointer"
                 disabled={loading}
               >
                 Clear
@@ -450,7 +450,7 @@ export default function Home() {
               </span>
               <button
                 onClick={handlePrint}
-                className="bg-green-600 text-white px-3 sm:px-4 py-1 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors text-xs sm:text-sm"
+                className="bg-green-600 text-white px-3 sm:px-4 py-1 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors text-xs sm:text-sm cursor-pointer"
               >
                 🖨️ Print All
               </button>
