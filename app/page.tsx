@@ -245,7 +245,7 @@ export default function Home() {
           currentProgress = 90;
         }
         setProgress(Math.min(currentProgress, 90));
-      }, 500);
+      }, 1000);
       return () => clearInterval(interval);
     }
   }, [loading]);
