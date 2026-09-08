@@ -1,0 +1,11 @@
+# Allow all robots to crawl
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://ducmcresult.vercel.app/sitemap.xml
+
+# Disallow admin pages
+User-agent: *
+Disallow: /api/
+Disallow: /_next/
