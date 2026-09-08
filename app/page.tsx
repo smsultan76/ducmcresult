@@ -3,7 +3,14 @@
 import { useState, useEffect, useRef } from 'react';
 import ResultTable from './components/ResultTable';
 import type { ResultData, Option } from '@/app/types';
-import Footer from './components/Footer';
+import dynamic from 'next/dynamic';
+
+const Footer = dynamic(() => import('./components/Footer'), {
+  ssr: false,
+  loading: () => (
+    <div className="bg-gray-900 mt-8 no-print" style={{ height: '200px' }} />
+  ),
+});
 
 export default function Home() {
   const [registrationInput, setRegistrationInput] = useState('');
