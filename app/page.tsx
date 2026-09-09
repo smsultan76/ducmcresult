@@ -67,7 +67,6 @@ export default function Home() {
     fetchOptions();
   }, []);
 
-  // Fetch exams when program changes
   useEffect(() => {
     const fetchExams = async () => {
       if (!programId) {
@@ -235,7 +234,6 @@ export default function Home() {
     }
   };
 
-  // Simulate progress updates from API
   useEffect(() => {
     if (loading) {
       let currentProgress = 0;
