@@ -248,8 +248,8 @@ export default function Home() {
       let currentProgress = 0;
       const interval = setInterval(() => {
         currentProgress += Math.random() * 7;
-        if (currentProgress > 90) {
-          currentProgress = 90;
+        if (currentProgress > 96) {
+          currentProgress = 96;
         }
         setProgress(Math.min(currentProgress, 96));
       }, 1000);
