@@ -231,28 +231,6 @@ export default function Home() {
     setExamError(null);
   };
 
-  const handlePrint = () => {
-    if (!printData) {
-      setError('No data to print. Please fetch results first.');
-      return;
-    }
-
-    // Open immediately as part of the user click
-    const printWindow = window.open('', '_blank');
-
-    if (!printWindow) {
-      setError('Please allow pop-ups for this site to open the print page.');
-      return;
-    }
-
-    // Save data before navigating
-    localStorage.setItem('printData', JSON.stringify(printData));
-
-    // Navigate the already-open tab
-    printWindow.location.href = '/print';
-  };
-
-
   useEffect(() => {
     if (loading) {
       let currentProgress = 0;
