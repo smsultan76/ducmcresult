@@ -11,8 +11,8 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { registrationInput, programId, sessionId, examId, turnstileToken } = body;
-    
-    if(!turnstileToken){
+
+    if (!turnstileToken) {
       return NextResponse.json(
         { success: false, error: 'Security verification is required.' },
         { status: 400 }
@@ -26,30 +26,30 @@ export async function POST(request: NextRequest) {
       );
     }
     const turnstileResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                secret: process.env.TURNSTILE_SECRET_KEY,
-                response: turnstileToken,
-                remoteip: request.headers.get('x-forwarded-for') || '',
-            }),
-        });
-      const turnstileResult = await turnstileResponse.json();
-      if (!turnstileResult.success) {
-          console.error(
-              'Turnstile verification failed:',
-              turnstileResult
-          );
-          return Response.json(
-              { success: false, error: 'Security verification failed. Please try again.' },
-              { status: 403 },
-          );
-      }
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        secret: process.env.TURNSTILE_SECRET_KEY,
+        response: turnstileToken,
+        remoteip: request.headers.get('x-forwarded-for') || '',
+      }),
+    });
+    const turnstileResult = await turnstileResponse.json();
+    if (!turnstileResult.success) {
+      console.error(
+        'Turnstile verification failed:',
+        turnstileResult
+      );
+      return Response.json(
+        { success: false, error: 'Security verification failed. Please try again.' },
+        { status: 403 },
+      );
+    }
 
     const registrations = parseRegistrationInput(registrationInput);
-    
+
     if (registrations.length === 0) {
       return NextResponse.json(
         { success: false, error: 'No valid registration numbers found' },
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
 
 function parseRegistrationInput(input: string): number[] {
   if (!input || input.trim() === '') return [];
-  
+
   const parts = input.replace(/\s/g, '').split(',');
   const registrations: number[] = [];
 
@@ -126,10 +126,10 @@ async function fetchBatchResults(
 
   for (let i = 0; i < registrations.length; i++) {
     const regNo = registrations[i];
-    
+
     try {
       console.log(`Fetching result for registration: ${regNo} (${i + 1}/${registrations.length})`);
-      
+
       let adjustedSessionId = sessionId;
       if (regNo < 900) {
         adjustedSessionId = 19;
@@ -139,11 +139,11 @@ async function fetchBatchResults(
 
       const result = await fetchSingleResult(regNo, programId, adjustedSessionId, examId);
       results.push(result);
-      
+
       if (i < registrations.length - 1) {
         await delay(REQUEST_DELAY);
       }
-      
+
     } catch (error) {
       console.error(`Failed to fetch registration ${regNo}:`, error);
       results.push({
@@ -205,11 +205,11 @@ async function fetchSingleResult(
 
     // Parse the HTML response
     const $ = cheerio.load(html);
-    
+
     const responseText = $('body').text();
-    if (responseText.includes('No result found') || 
-        responseText.includes('not found') ||
-        responseText.includes('Invalid')) {
+    if (responseText.includes('No result found') ||
+      responseText.includes('not found') ||
+      responseText.includes('Invalid')) {
       return {
         reg_no: regNo,
         student_name: 'Not found',
@@ -220,7 +220,7 @@ async function fetchSingleResult(
         error: 'No result found'
       };
     }
-    
+
     let studentName = '';
     let collegeName = '';
     let session = '';
@@ -229,7 +229,7 @@ async function fetchSingleResult(
     let classRoll = '';
     let examYear = '';
     let publicationDate = '';
-    
+
     $('table tr').each((_, row) => {
       const th = $(row).find('th');
       const td = $(row).find('td');
@@ -259,7 +259,7 @@ async function fetchSingleResult(
     // Extract GPA and CGPA from the HTML
     let gpa: number | null = null;
     let cgpa: number | null = null;
-    
+
     // Try to find CGPA in the status div
     const cgpaMatch = responseText.match(/CGPA:\s*([\d.]+)/i);
     if (cgpaMatch) {
@@ -276,12 +276,12 @@ async function fetchSingleResult(
     let status = '';
     let failedSubjects: string[] = [];
     let promotedWithCount = 0;
-    
+
     // Find the status div
     const statusDiv = $('td div[style*="font-weight: bold;font-size: 25px;"]');
     if (statusDiv.length > 0) {
       const statusText = statusDiv.text().trim();
-      
+
       // Check for Promoted with failed subjects
       if (statusText.includes('Promoted')) {
         status = 'Promoted';
@@ -374,7 +374,7 @@ async function fetchSingleResult(
           }
         }
       });
-      
+
       if (hasF) {
         status = 'Failed';
         $('table tr').each((_, row) => {

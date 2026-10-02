@@ -129,7 +129,7 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if(!turnstileToken){
+    if (!turnstileToken) {
       setError('Please complete the security check.');
       return;
     }
@@ -401,8 +401,8 @@ export default function Home() {
               <div>
                 <Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
                   onSuccess={(Token) => setTurnstileToken(Token)}
-                  onError={()=> setError('Security check failed. Please try again.')}
-                  options={{theme : 'light'}}
+                  onError={() => setError('Security check failed. Please try again.')}
+                  options={{ theme: 'light' }}
                   onExpire={() => setTurnstileToken('')}
                 />
               </div>
@@ -522,12 +522,12 @@ export default function Home() {
             </h2>
             <div className="prose prose-sm max-w-none text-gray-600 space-y-3">
               <p>
-                The DU CMC Result System is an online platform for students of Dhaka University 
-                Constituent Enginnering Colleges and Medical Colleges to check their academic results. This system allows 
+                The DU CMC Result System is an online platform for students of Dhaka University
+                Constituent Enginnering Colleges and Medical Colleges to check their academic results. This system allows
                 students to view their results by registration number, program, session, and exam name.
               </p>
               <p>
-                With the batch result lookup feature, users can check results for multiple students 
+                With the batch result lookup feature, users can check results for multiple students
                 at once, making it ideal for educational institutions and administrators.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
