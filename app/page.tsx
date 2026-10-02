@@ -493,12 +493,13 @@ export default function Home() {
                     </span>
                   )}
                 </span>
-                <button
-                  onClick={handlePrint}
-                  className="bg-green-600 text-white px-3 sm:px-4 py-1 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors text-xs sm:text-sm cursor-pointer"
-                >
-                  🖨️ Print All
-                </button>
+                <a href="/print" target="_blank" rel="noopener noreferrer"
+                  onClick={() => localStorage.setItem('printData', JSON.stringify(printData))}>
+                  <button
+                    className="bg-green-600 text-white px-3 sm:px-4 py-1 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors text-xs sm:text-sm cursor-pointer">
+                    🖨️ Print All
+                  </button>
+                </a>
               </div>
             )}
           </div>
