@@ -43,6 +43,8 @@ export default function Home() {
 
   const tableRef = useRef<HTMLDivElement>(null);
 
+  const [turnstileToken, setTurnstileToken] = useState<string>('');
+
   // Fetch programs and sessions on component mount
   useEffect(() => {
     const fetchOptions = async () => {
@@ -126,6 +128,11 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if(!turnstileToken){
+      setError('Please complete the security check.');
+      return;
+    }
+
     if (!registrationInput || !programId || !sessionId || !examId) {
       setError('All fields are required');
       return;
@@ -156,7 +163,8 @@ export default function Home() {
           registrationInput,
           programId,
           sessionId,
-          examId
+          examId,
+          turnstileToken
         })
       });
 
