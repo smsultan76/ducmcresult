@@ -5,6 +5,7 @@ import ResultTable from './components/ResultTable';
 import type { ResultData, Option } from '@/app/types';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 const Footer = dynamic(() => import('./components/Footer'), {
   ssr: false,
@@ -396,6 +397,14 @@ export default function Home() {
                     </p>
                   )}
                 </div>
+              </div>
+              <div>
+                <Turnstile siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                  onSuccess={(Token) => setTurnstileToken(Token)}
+                  onError={()=> setError('Security check failed. Please try again.')}
+                  options={{theme : 'light'}}
+                  onExpire={() => setTurnstileToken('')}
+                />
               </div>
 
               {/* Action Buttons */}
