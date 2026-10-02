@@ -232,16 +232,26 @@ export default function Home() {
   };
 
   const handlePrint = () => {
-    if (printData) {
-      localStorage.setItem('printData', JSON.stringify(printData));
-      const printWindow = window.open('/print', '_blank');
-      if (!printWindow) {
-        window.location.href = '/print';
-      }
-    } else {
+    if (!printData) {
       setError('No data to print. Please fetch results first.');
+      return;
     }
+
+    // Open immediately as part of the user click
+    const printWindow = window.open('', '_blank');
+
+    if (!printWindow) {
+      setError('Please allow pop-ups for this site to open the print page.');
+      return;
+    }
+
+    // Save data before navigating
+    localStorage.setItem('printData', JSON.stringify(printData));
+
+    // Navigate the already-open tab
+    printWindow.location.href = '/print';
   };
+
 
   useEffect(() => {
     if (loading) {
