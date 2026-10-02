@@ -10,7 +10,14 @@ const MAX_REGISTRATIONS = parseInt(process.env.DUCMC_MAX_REGISTRATIONS || '60');
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { registrationInput, programId, sessionId, examId } = body;
+    const { registrationInput, programId, sessionId, examId, turnstileToken } = body;
+    
+    if(!turnstileToken){
+      return NextResponse.json(
+        { success: false, error: 'Security verification is required.' },
+        { status: 400 }
+      )
+    }
 
     if (!registrationInput || !programId || !sessionId || !examId) {
       return NextResponse.json(
@@ -18,6 +25,28 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+    const turnstileResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                secret: process.env.TURNSTILE_SECRET_KEY,
+                response: turnstileToken,
+                remoteip: request.headers.get('x-forwarded-for') || '',
+            }),
+        });
+      const turnstileResult = await turnstileResponse.json();
+      if (!turnstileResult.success) {
+          console.error(
+              'Turnstile verification failed:',
+              turnstileResult
+          );
+          return Response.json(
+              { success: false, error: 'Security verification failed. Please try again.' },
+              { status: 403 },
+          );
+      }
 
     const registrations = parseRegistrationInput(registrationInput);
     
