@@ -247,11 +247,11 @@ export default function Home() {
     if (loading) {
       let currentProgress = 0;
       const interval = setInterval(() => {
-        currentProgress += Math.random() * 10;
+        currentProgress += Math.random() * 7;
         if (currentProgress > 90) {
           currentProgress = 90;
         }
-        setProgress(Math.min(currentProgress, 90));
+        setProgress(Math.min(currentProgress, 96));
       }, 1000);
       return () => clearInterval(interval);
     }
