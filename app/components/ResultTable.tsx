@@ -68,7 +68,7 @@ export default function ResultTable({ results, programName, sessionName, examNam
 
   const getGpaColorClass = (gpa: number | null) => {
     if (gpa === null) return 'text-gray-400';
-    if (gpa >= 3.5) return 'text-green-600 font-semibold';
+    if (gpa >= 3.0) return 'text-green-600 font-semibold';
     if (gpa >= 2.5) return 'text-yellow-600 font-semibold';
     return 'text-red-600 font-semibold';
   };
